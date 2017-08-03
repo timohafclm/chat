@@ -2,9 +2,7 @@ package com.company;
 
 import java.io.Serializable;
 
-/**
- * Created by Игорь on 02.08.2017.
- */
+
 public class Message implements Serializable {
     private final MessageType type;
     private final String data;

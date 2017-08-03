@@ -5,9 +5,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-/**
- * Created by Игорь on 02.08.2017.
- */
+
 public class Connection implements Closeable {
     private final Socket socket;
     private final ObjectOutputStream out;
