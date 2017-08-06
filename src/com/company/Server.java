@@ -25,7 +25,7 @@ public class Server {
     }
 
     /**
-     * Реализовывает протокол общения с сервером.
+     * Реализовывает протокол общения сервера с клиентом.
      */
     private static class Handler extends Thread {
         private Socket socket;
@@ -36,7 +36,7 @@ public class Server {
 
         @Override
         public void run() {
-            String userName="";
+            String userName = "";
             ConsoleHelper.writeMessage("Connection to " + socket.getRemoteSocketAddress());
             try (Connection connection = new Connection(socket)) {
                 userName = serverHandshake(connection);
@@ -48,7 +48,7 @@ public class Server {
             } catch (ClassNotFoundException e) {
                 ConsoleHelper.writeMessage("Remote call error");
             } finally {
-                if (!userName.isEmpty()){
+                if (!userName.isEmpty()) {
                     connectionMap.remove(userName);
                     sendBroadcastMessage(new Message(MessageType.USER_REMOVED, userName));
                     ConsoleHelper.writeMessage("Connected closed");
@@ -70,21 +70,15 @@ public class Server {
 
             while (true) {
                 connection.send(new Message(MessageType.NAME_REQUEST));
-                Message responseMessage = connection.receive();
-                if (responseMessage.getType() == MessageType.USER_NAME && !userName.trim().isEmpty())
-                    userName = responseMessage.getData();
-                else {
-                    connection.send(new Message(MessageType.TEXT, "Invalid username"));
-                    continue;
-                }
-                if (!connectionMap.containsKey(userName)) {
-                    connectionMap.put(userName, connection);
-                } else {
-                    connection.send(new Message(MessageType.TEXT, "This name is busy"));
-                    continue;
-                }
+                Message response = connection.receive();
+                String responseName;
+                if (response.getType() == MessageType.USER_NAME) responseName = response.getData();
+                else continue;
+                if (!responseName.trim().isEmpty() && !connectionMap.containsKey(responseName))
+                    connectionMap.put(responseName, connection);
+                else continue;
                 connection.send(new Message(MessageType.NAME_ACCEPTED));
-                return userName;
+                return responseName;
             }
         }
 
