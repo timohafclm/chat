@@ -66,19 +66,18 @@ public class Server {
          * @throws ClassNotFoundException
          */
         private String serverHandshake(Connection connection) throws IOException, ClassNotFoundException {
-            String userName = "";
 
             while (true) {
                 connection.send(new Message(MessageType.NAME_REQUEST));
                 Message response = connection.receive();
-                String responseName;
-                if (response.getType() == MessageType.USER_NAME) responseName = response.getData();
+                String userName;
+                if (response.getType() == MessageType.USER_NAME) userName = response.getData();
                 else continue;
-                if (!responseName.trim().isEmpty() && !connectionMap.containsKey(responseName))
-                    connectionMap.put(responseName, connection);
+                if (!userName.trim().isEmpty() && !connectionMap.containsKey(userName))
+                    connectionMap.put(userName, connection);
                 else continue;
                 connection.send(new Message(MessageType.NAME_ACCEPTED));
-                return responseName;
+                return userName;
             }
         }
 
